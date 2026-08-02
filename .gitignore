@@ -10,3 +10,7 @@ data/templates/*.xlsx
 !data/inbox/clubs.xlsx
 .DS_Store
 *.egg-info/
+
+# Claude Code local tooling
+.claude/
+CLAUDE.local.md
