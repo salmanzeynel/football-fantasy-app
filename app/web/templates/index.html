@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Catalog status</h1>
+<p class="muted">
+  What has been imported so far. Feed this with the sheets in <code>data/inbox/</code>.
+</p>
+
+<div class="cards">
+  {% for label, value in counts %}
+  <div class="card">
+    <div class="value">{{ value }}</div>
+    <div class="label">{{ label }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if season %}
+<p class="muted">Current season: <strong>{{ season.name }}</strong> ({{ season.code }})</p>
+{% else %}
+<p class="warn">No season yet. Create one with <code>fantasy season add</code>.</p>
+{% endif %}
+
+<h2>Next steps</h2>
+<ol class="steps">
+  <li><code>fantasy init-templates</code> — write blank sheets to <code>data/templates/</code></li>
+  <li>Fill them in and save to <code>data/inbox/</code></li>
+  <li><code>fantasy import clubs --dry-run</code> then without the flag</li>
+  <li>Same for <code>players</code> and <code>fixtures</code></li>
+</ol>
+<p class="muted">M2 replaces this page with real auth and a player browser.</p>
+{% endblock %}
