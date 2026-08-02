@@ -6,6 +6,7 @@ module must be imported here.
 
 from app.models.catalog import Club, Fixture, Gameweek, Player, Season
 from app.models.enums import FixtureStatus, PlayerStatus, Position, SourceKind
+from app.models.identity import User
 
 __all__ = [
     "Club",
@@ -17,4 +18,5 @@ __all__ = [
     "Position",
     "Season",
     "SourceKind",
+    "User",
 ]

@@ -1,47 +1,35 @@
-from pathlib import Path
-
-from fastapi import Depends, FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from sqlmodel import Session, func, select
+from starlette.middleware.sessions import SessionMiddleware
 
 from app.config import get_settings
-from app.db import get_session
-from app.models.catalog import Club, Fixture, Gameweek, Player, Season
-
-WEB_DIR = Path(__file__).resolve().parent / "web"
-templates = Jinja2Templates(directory=str(WEB_DIR / "templates"))
+from app.web.deps import WEB_DIR, LoginRequired, flash, redirect
+from app.web.routes import auth, home, players
 
 
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title="Fantasy Süper Lig", debug=settings.debug)
+
+    # Signed cookie sessions. Adequate while the app is local-only; if this is ever
+    # hosted, revisit with a server-side store and https_only=True.
+    app.add_middleware(
+        SessionMiddleware,
+        secret_key=settings.secret_key,
+        same_site="lax",
+        max_age=60 * 60 * 24 * 30,
+    )
+
     app.mount("/static", StaticFiles(directory=str(WEB_DIR / "static")), name="static")
 
-    @app.get("/", response_class=HTMLResponse)
-    def index(request: Request, session: Session = Depends(get_session)):
-        def count(model) -> int:
-            return session.exec(select(func.count()).select_from(model)).one()
+    app.include_router(home.router)
+    app.include_router(auth.router)
+    app.include_router(players.router)
 
-        season = session.exec(select(Season).where(Season.is_current)).first()
-        return templates.TemplateResponse(
-            request,
-            "index.html",
-            {
-                "counts": [
-                    ("Clubs", count(Club)),
-                    ("Players", count(Player)),
-                    ("Gameweeks", count(Gameweek)),
-                    ("Fixtures", count(Fixture)),
-                ],
-                "season": season,
-            },
-        )
-
-    @app.get("/healthz")
-    def healthz():
-        return {"status": "ok"}
+    @app.exception_handler(LoginRequired)
+    def _login_required(request: Request, exc: LoginRequired):
+        flash(request, "Please sign in to continue.", "info")
+        return redirect(f"/login?next={exc.next_url}")
 
     return app
 

@@ -290,7 +290,7 @@ Estimates assume focused solo work.
 |---|---|---|---|
 | ~~**M0**~~ | ~~Skeleton~~ | ~~0.5d~~ | **✅ done** — uvicorn serves the catalog status page, SQLite + Alembic wired, 29 tests pass, `fantasy --help` runs |
 | ~~**M1**~~ | ~~Catalog + Excel ingest~~ | ~~2d~~ | **✅ done** — 18 clubs imported; verified against a synthetic full season (306 fixtures, 34 gameweeks auto-created). Re-import is a no-op, bad rows produce row-numbered errors and write nothing |
-| **M2** | Auth + app shell | 1d | Register, log in, log out. Base layout with nav. Player pool page: filter by club/position/status, sort by price, paginated |
+| ~~**M2**~~ | ~~Auth + app shell~~ | ~~1d~~ | **✅ done** — argon2 accounts, cookie sessions, register/login/logout, nav + flash messages, and a player pool with search, club/position/status filters, sortable columns and paging. All state lives in the URL, so the page needs no JavaScript |
 | **M3** | Leagues + teams | 1d | Create a league with settings, join by code, add bot managers, see "My Team" |
 | **M4** | **Draft engine (core)** | 2d | State machine passes unit tests: snake order, positional limits, timeouts, autopick, queue handling, full 10×15 draft simulated headlessly with zero illegal rosters |
 | **M5** | Draft room (UI) | 1.5d | Live board over SSE, pick clock, queue drag-ordering, available-player filter. A real draft completes in the browser against 9 bots |

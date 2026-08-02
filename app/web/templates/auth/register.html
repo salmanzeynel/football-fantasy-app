@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Create account · Fantasy Süper Lig{% endblock %}
+{% block main_class %}narrow{% endblock %}
+
+{% block content %}
+<h1>Create account</h1>
+
+{% if is_first_account %}
+<p class="muted">This is the first account on this instance — it will be yours.</p>
+{% endif %}
+
+{% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+
+<form method="post" action="/register" class="stack">
+  <label>
+    Display name
+    <input type="text" name="display_name" value="{{ display_name or '' }}" required autofocus>
+    <span class="hint">What other managers see in the draft and standings.</span>
+  </label>
+  <label>
+    Email
+    <input type="email" name="email" value="{{ email or '' }}" required autocomplete="username">
+  </label>
+  <label>
+    Password
+    <input type="password" name="password" required minlength="8" autocomplete="new-password">
+    <span class="hint">At least 8 characters.</span>
+  </label>
+  <label>
+    Confirm password
+    <input type="password" name="password_confirm" required autocomplete="new-password">
+  </label>
+  <button type="submit" class="btn">Create account</button>
+</form>
+
+<p class="muted">Already registered? <a href="/login">Sign in</a>.</p>
+<p class="hint">
+  There is no password reset in phase 1 — this instance runs locally and has no email.
+</p>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Players · Fantasy Süper Lig{% endblock %}
+{% block main_class %}wide{% endblock %}
+
+{% block content %}
+<h1>Player pool</h1>
+<p class="muted">
+  Everything imported from <code>players.xlsx</code>. Filters live in the URL, so any
+  view here can be bookmarked or shared.
+</p>
+
+<form method="get" action="/players" class="filters">
+  <input type="search" name="q" value="{{ filters.q }}" placeholder="Search name…" aria-label="Search by name">
+
+  <select name="club" aria-label="Club">
+    <option value="">All clubs</option>
+    {% for c in clubs %}
+      <option value="{{ c.club_code }}" {% if filters.club == c.club_code %}selected{% endif %}>{{ c.name }}</option>
+    {% endfor %}
+  </select>
+
+  <select name="position" aria-label="Position">
+    <option value="">All positions</option>
+    {% for p in positions %}
+      <option value="{{ p.value }}" {% if filters.position == p.value %}selected{% endif %}>{{ p.value }}</option>
+    {% endfor %}
+  </select>
+
+  <select name="status" aria-label="Availability">
+    <option value="">Any status</option>
+    {% for s in statuses %}
+      <option value="{{ s.value }}" {% if filters.status == s.value %}selected{% endif %}>{{ s.value|capitalize }}</option>
+    {% endfor %}
+  </select>
+
+  <input type="hidden" name="sort" value="{{ filters.sort }}">
+  <input type="hidden" name="direction" value="{{ filters.direction }}">
+
+  <button type="submit" class="btn">Filter</button>
+  <a href="/players" class="linkish">Reset</a>
+</form>
+
+{% include "players/_results.html" %}
+{% endblock %}

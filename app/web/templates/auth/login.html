@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Sign in · Fantasy Süper Lig{% endblock %}
+{% block main_class %}narrow{% endblock %}
+
+{% block content %}
+<h1>Sign in</h1>
+
+{% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+
+<form method="post" action="/login" class="stack">
+  {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+  <label>
+    Email
+    <input type="email" name="email" value="{{ email or '' }}" required autofocus autocomplete="username">
+  </label>
+  <label>
+    Password
+    <input type="password" name="password" required autocomplete="current-password">
+  </label>
+  <button type="submit" class="btn">Sign in</button>
+</form>
+
+<p class="muted">No account yet? <a href="/register">Create one</a>.</p>
+{% endblock %}

@@ -7,11 +7,11 @@
 </p>
 
 <div class="cards">
-  {% for label, value in counts %}
-  <div class="card">
-    <div class="value">{{ value }}</div>
-    <div class="label">{{ label }}</div>
-  </div>
+  {% for label, value, href in counts %}
+    {% if href %}<a class="card" href="{{ href }}">{% else %}<div class="card">{% endif %}
+      <div class="value">{{ value }}</div>
+      <div class="label">{{ label }}</div>
+    {% if href %}</a>{% else %}</div>{% endif %}
   {% endfor %}
 </div>
 
@@ -28,5 +28,5 @@
   <li><code>fantasy import clubs --dry-run</code> then without the flag</li>
   <li>Same for <code>players</code> and <code>fixtures</code></li>
 </ol>
-<p class="muted">M2 replaces this page with real auth and a player browser.</p>
+<p class="muted">M3 adds leagues and teams; M4 the snake draft.</p>
 {% endblock %}

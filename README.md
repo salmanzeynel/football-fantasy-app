@@ -5,8 +5,8 @@ is fed by Excel sheets you maintain, and uses a snake draft.
 
 Full roadmap: [docs/PLAN.md](docs/PLAN.md).
 
-**Status: M0 + M1 complete** — project skeleton, catalog models, and Excel ingest.
-Auth, leagues, the draft, and scoring are still ahead (M2 onward).
+**Status: M0–M2 complete** — project skeleton, catalog models, Excel ingest, accounts,
+and the player pool. Leagues, the draft, and scoring are still ahead (M3 onward).
 
 ## Setup
 
@@ -68,8 +68,23 @@ is set to its first kickoff — that is when lineups will lock.
 .venv/bin/fantasy serve
 ```
 
-Then open http://127.0.0.1:8000. Right now this is a catalog status page; M2 replaces it
-with login and a real player browser.
+Then open http://127.0.0.1:8000 and create an account — the first one you register is
+just a normal account; there is no admin role yet.
+
+Pages so far:
+
+| Path | What it does |
+|---|---|
+| `/` | Catalog status — what has been imported |
+| `/players` | Player pool: search, filter by club/position/status, sortable columns, paged |
+| `/register`, `/login` | Accounts |
+
+Passwords are hashed with argon2id and sessions are signed cookies. There is **no
+password reset** — the app is local-only and has no email. If you lock yourself out,
+delete the row from the `user` table and register again.
+
+Filtering and sorting are plain query parameters, so any view of the player pool is a
+shareable URL and the page works with JavaScript disabled.
 
 ## Tests
 
@@ -91,7 +106,9 @@ see them.
 
 | Path | What lives there |
 |---|---|
-| `app/models/` | SQLModel tables. `catalog.py` is the real-world football data |
+| `app/models/` | SQLModel tables. `catalog.py` is football data, `identity.py` is accounts |
+| `app/services/` | Logic with no web dependencies — `auth.py` today |
+| `app/web/deps.py` | Session helpers, `get_current_user` / `require_user`, template rendering |
 | `app/ingest/rows.py` | Validated row schemas — the shape every data source must produce |
 | `app/ingest/protocol.py` | `DataSource` — the seam a live API plugs into in phase 2 |
 | `app/ingest/excel/` | Spreadsheet reader, header specs, template generator |

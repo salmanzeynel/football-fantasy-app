@@ -1,0 +1,91 @@
+{#- Results table + pager. Every link rebuilds the full query string so filters survive
+    sorting and paging. -#}
+
+{%- macro qs(overrides) -%}
+  {%- set merged = dict(filters, **overrides) -%}
+  ?{% for key, value in merged.items() if value %}{{ key }}={{ value|urlencode }}&amp;{% endfor %}
+{%- endmacro -%}
+
+{%- macro sort_header(key, label, numeric=False) -%}
+  {%- set is_active = filters.sort == key -%}
+  {%- set next_dir = 'asc' if (is_active and filters.direction == 'desc') else ('desc' if is_active else ('desc' if numeric else 'asc')) -%}
+  <th class="{% if numeric %}num{% endif %} {% if is_active %}sorted{% endif %}">
+    <a href="/players{{ qs({'sort': key, 'direction': next_dir, 'page': ''}) }}">
+      {{ label }}{% if is_active %}<span class="caret">{{ '▾' if filters.direction == 'desc' else '▴' }}</span>{% endif %}
+    </a>
+  </th>
+{%- endmacro -%}
+
+{% if total %}
+<p class="resultcount muted">
+  Showing {{ showing_from }}–{{ showing_to }} of {{ total }} player{{ '' if total == 1 else 's' }}
+</p>
+
+<table class="grid">
+  <thead>
+    <tr>
+      {{ sort_header('name', 'Player') }}
+      {{ sort_header('club', 'Club') }}
+      {{ sort_header('position', 'Pos') }}
+      <th>Status</th>
+      {{ sort_header('price', 'Price', numeric=True) }}
+    </tr>
+  </thead>
+  <tbody>
+    {% for player, club in rows %}
+    <tr>
+      <td>
+        <span class="pname">{{ player.display_name }}</span>
+        {% if player.full_name != player.display_name %}
+          <span class="hint">{{ player.full_name }}</span>
+        {% endif %}
+      </td>
+      <td>
+        <span class="chip" {% if club.primary_color %}style="--chip: {{ club.primary_color }}"{% endif %}>
+          {{ club.short_name }}
+        </span>
+      </td>
+      <td><span class="pos pos-{{ player.position.value }}">{{ player.position.value }}</span></td>
+      <td>
+        {% if player.status.value == 'active' %}
+          <span class="muted">—</span>
+        {% else %}
+          <span class="status {{ player.status.value }}">{{ player.status.value }}</span>
+        {% endif %}
+      </td>
+      <td class="num">{{ "%.1f"|format(player.price) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if pages > 1 %}
+<nav class="pager">
+  {% if page > 1 %}
+    <a href="/players{{ qs({'page': page - 1}) }}">← Previous</a>
+  {% else %}
+    <span class="disabled">← Previous</span>
+  {% endif %}
+  <span class="muted">Page {{ page }} of {{ pages }}</span>
+  {% if page < pages %}
+    <a href="/players{{ qs({'page': page + 1}) }}">Next →</a>
+  {% else %}
+    <span class="disabled">Next →</span>
+  {% endif %}
+</nav>
+{% endif %}
+
+{% else %}
+<div class="empty">
+  {% if filters.q or filters.club or filters.position or filters.status %}
+    <p>No players match those filters.</p>
+    <p><a href="/players">Clear filters</a></p>
+  {% else %}
+    <p>No players imported yet.</p>
+    <p class="muted">
+      Fill in <code>data/templates/players.xlsx</code>, save it to <code>data/inbox/</code>,
+      then run <code>fantasy import players</code>.
+    </p>
+  {% endif %}
+</div>
+{% endif %}
